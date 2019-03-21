@@ -12,7 +12,7 @@ from collections import OrderedDict
 from exif_read import ExifRead
 from exif_write import ExifEdit
 from exif_aux import verify_exif
-from geo import normalize_bearing, interpolate_lat_lon, gps_distance, gps_speed
+from geo import offset_bearing, interpolate_lat_lon, gps_distance, gps_speed
 import config
 import uploader
 import dateutil.tz
@@ -173,7 +173,7 @@ def get_geotag_properties_from_exif(image, offset_angle=0.0, verbose=False):
         heading = exif.extract_direction()
         if heading is None:
             heading = 0.0
-        heading = normalize_bearing(heading + offset_angle)
+        heading = offset_bearing(heading, offset_angle)
         # bearing of the image
         geotag_properties["MAPCompassHeading"] = {"TrueHeading": heading,
                                                   "MagneticHeading": heading}
