@@ -45,10 +45,10 @@ def verify_exif(filename):
 
 
 def verify_mapillary_tag(filepath):
-    filepath_keep_original = processing.processed_images_rootpath(filepath)
-    if os.path.isfile(filepath_keep_original):
-        filepath = filepath_keep_original
     '''
     Check that image file has the required Mapillary tag
     '''
+    filepath_keep_original = processing.processed_images_rootpath(filepath)
+    if os.path.isfile(filepath_keep_original):
+        filepath = filepath_keep_original
     return ExifRead(filepath).mapillary_tag_exists()
