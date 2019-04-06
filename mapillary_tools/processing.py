@@ -12,7 +12,7 @@ from collections import OrderedDict
 from exif_read import ExifRead
 from exif_write import ExifEdit
 from exif_aux import verify_exif
-from geo import offset_bearing, interpolate_lat_lon, gps_distance, gps_speed
+from geo import offset_bearing, interpolate_lat_lon, gps_distance
 import config
 import uploader
 import dateutil.tz
