@@ -149,6 +149,10 @@ def process_sequence_properties(import_path,
                 d is not None and not interpolate_directions) else (interpolated_directions[i] + offset_angle) % 360.0
         # ---------------------------------------
 
+        # INTERPOLATE TIMESTAMPS, in case of duplicate timestamps, so we
+        # have meaningful values when computing the speed
+        capture_times = processing.interpolate_timestamp(capture_times)
+
         # COMPUTE SPEED -------------------------------------------
         computed_delta_ts = [(t1 - t0).total_seconds()
                              for t0, t1 in zip(capture_times[:-1], capture_times[1:])]
@@ -159,9 +163,6 @@ def process_sequence_properties(import_path,
         if len([x for x in computed_speeds if x > MAX_CAPTURE_SPEED]) > 0:
             print("Warning: The distance in sequence including images\n{}\nto\n{}\nis too large for the time difference (very high apparent capture speed). Are you sure timestamps and locations are correct?".format(
                 file_list[0], file_list[-1]))
-
-        # INTERPOLATE TIMESTAMPS, in case of identical timestamps
-        capture_times = processing.interpolate_timestamp(capture_times)
 
         final_file_list = file_list[:]
         final_directions = directions[:]
