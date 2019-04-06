@@ -1135,14 +1135,14 @@ def split_sequences(capture_times, lats, lons, file_list, directions, cutoff_tim
 
 def interpolate_timestamp(capture_times):
     '''
-    Interpolate time stamps in case of identical timestamps
+    Interpolate timestamps in case of identical timestamps.
+
+    For instance this can happen when there is more than one image per second
+    but the timestamps have a 1 second granularity. So if 3 images are
+    taken each second we will put the first one at s=1*0/3, the second one at
+    s=1*1/3 and the third at s=1*2/3.
     '''
-    timestamps = []
-    num_file = len(capture_times)
-
-    time_dict = OrderedDict()
-
-    if num_file < 2:
+    if len(capture_times) < 2:
         return capture_times
 
     # trace identical timestamps (always assume capture_times is sorted)
@@ -1151,10 +1151,9 @@ def interpolate_timestamp(capture_times):
         if t not in time_dict:
             time_dict[t] = {
                 "count": 0,
-                "pointer": 0
+                "rank": 0
             }
 
-            interval = 0
             if i != 0:
                 interval = (t - capture_times[i - 1]).total_seconds()
                 time_dict[capture_times[i - 1]]["interval"] = interval
@@ -1163,21 +1162,22 @@ def interpolate_timestamp(capture_times):
 
     if len(time_dict) >= 2:
         # set time interval as the last available time interval
-        time_dict[time_dict.keys()[-1]
-                  ]["interval"] = time_dict[time_dict.keys()[-2]]["interval"]
+        last_time = time_dict.keys()[-1]
+        penultimate_time = time_dict.keys()[-2]
+        time_dict[last_time]["interval"] = time_dict[penultimate_time]["interval"]
     else:
         # set time interval assuming capture interval is 1 second
-        time_dict[time_dict.keys()[0]]["interval"] = time_dict[time_dict.keys()[
-            0]]["count"] * 1.
+        time = time_dict.keys()[0]
+        time_dict[time]["interval"] = time_dict[time]["count"] * 1.
 
     # interpolate timestamps
+    timestamps = []
     for t in capture_times:
         d = time_dict[t]
         s = datetime.timedelta(
-            seconds=d["pointer"] * d["interval"] / float(d["count"]))
-        updated_time = t + s
-        time_dict[t]["pointer"] += 1
-        timestamps.append(updated_time)
+            seconds=d["interval"] * d["rank"] / float(d["count"]))
+        time_dict[t]["rank"] += 1
+        timestamps.append(t + s)
 
     return timestamps
 
