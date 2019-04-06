@@ -5,7 +5,6 @@ from geo import write_gpx
 def get_points_from_exif(file_list, verbose=False):
     data = []
     for file in file_list:
-        point = ()
         try:
             exif = exif_read.ExifRead(file)
         except:
@@ -26,10 +25,10 @@ def get_points_from_exif(file_list, verbose=False):
                 print(
                     "Warning {} image capture time tag not in EXIF.".format(file))
             continue
-        if lon != None and lat != None and timestamp != None:
-            point = point + (timestamp, lat, lon)
-        else:
+        if lon is None or lat is None or timestamp is None:
             continue
+
+        point = (timestamp, lat, lon)
         try:
             altitude = exif.extract_altitude()
             point = point + (altitude, )
@@ -40,8 +39,7 @@ def get_points_from_exif(file_list, verbose=False):
             point = point + (heading, )
         except:
             pass
-        if point:
-            data.append(point)
+        data.append(point)
     return data
 
 
