@@ -62,8 +62,8 @@ def exif_time(filename, default_tzinfo=None):
 
 def estimate_sub_second_time(files, interval=0.0, tzinfo=None):
     '''
-    Estimate the capture time of a sequence with sub-second precision
-    EXIF times are only given up to a second of precision. This function
+    Estimate the capture time of a sequence with sub-second precision.
+    Some cameras only store EXIF times rounded to the second. This function
     uses the given interval between shots to estimate the time inside that
     second that each picture was taken.
     '''
